@@ -1,0 +1,27 @@
+{
+  "name": "glue",
+  "type": "module",
+  "scripts": {
+    "prisma:generate": "npx prisma generate",
+    "build": "esbuild --bundle --outfile=./dist/index.js --platform=node --target=node20 --external:@prisma/client --external:.prisma/client ./src/index.ts",
+    "zip": "zip -j lambda.zip dist/index.js",
+    "build:layer": "rm -rf layer && mkdir -p layer/nodejs/node_modules && npx prisma generate && cp -r node_modules/.prisma layer/nodejs/node_modules/ && cp -r node_modules/@prisma layer/nodejs/node_modules/",
+    "zip:layer": "cd layer && zip -r ../prisma-layer.zip . && cd ..",
+    "upload:layer": "aws s3 cp prisma-layer.zip s3://glue-layer/prisma-layer.zip",
+    "publish:layer": "aws lambda publish-layer-version --layer-name prisma-layer --content S3Bucket=glue-layer,S3Key=prisma-layer.zip --compatible-runtimes nodejs20.x",
+    "attach:layer": "aws lambda update-function-configuration --function-name glue-backend --layers arn:aws:lambda:ap-south-1:687153656197:layer:prisma-layer:1",
+    "update": "aws lambda update-function-code --zip-file fileb://lambda.zip --function-name glue-backend",
+    "deploy": "run-s build zip update",
+    "deploy:layer": "run-s build:layer zip:layer upload:layer publish:layer",
+    "deploy:first": "run-s deploy:layer attach:layer deploy"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.4",
+    "npm-run-all2": "^6.2.0"
+  },
+  "dependencies": {
+    "@hono/zod-openapi": "^1.1.3",
+    "@prisma/client": "^6.16.3",
+    "hono": "^4.9.10"
+  }
+}
