@@ -11,11 +11,8 @@ RUN npm ci --omit=dev
 COPY . ${LAMBDA_TASK_ROOT}/
 
 # Build TypeScript if needed
-RUN if [ -f "tsconfig.json" ]; then \
-    npm install -D typescript && \
-    npx tsc && \
-    npm uninstall typescript; \
-    fi
+
+RUN npm run build
 
 # Set the CMD to your handler
 CMD [ "dist/index.handler" ]
