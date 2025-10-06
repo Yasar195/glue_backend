@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "prisma:generate": "npx prisma generate",
-    "build": "prisma:generate && esbuild --bundle --format=esm --outfile=./dist/index.js --platform=node --target=node20 --external:@prisma/client --external:.prisma/client ./src/index.ts",
+    "build": "npm run prisma:generate && esbuild --bundle --format=esm --outfile=./dist/index.js --platform=node --target=node20 --external:@prisma/client --external:.prisma/client ./src/index.ts",
     "zip": "zip -j lambda.zip dist/index.js",
     "build:layer": "rm -rf layer && mkdir -p layer/nodejs/node_modules && npx prisma generate && cp -r node_modules/.prisma layer/nodejs/node_modules/ && cp -r node_modules/@prisma layer/nodejs/node_modules/",
     "zip:layer": "cd layer && zip -r ../prisma-layer.zip . && cd ..",
