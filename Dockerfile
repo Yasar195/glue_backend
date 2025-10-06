@@ -12,7 +12,7 @@ RUN npm ci
 
 # Build the application
 RUN npm run build
-
+RUN npx prisma generate
 # Remove dev dependencies to reduce image size
 RUN npm prune --omit=dev
 
