@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { ApiResponse, MessageResponse } from "../common/types";
 import { AuthService } from "./service";
-import { Context } from "hono/jsx";
+import { Context } from "hono";
 import { Auth } from "../common/auth.class";
 import { RegisterUserInput } from "./types/auth.types";
 import { z } from '@hono/zod-openapi'
@@ -18,18 +18,17 @@ class AuthRouter  {
         this.AuthClass = new Auth();
     }
 
-    async register(c: any) {
+    async register(c: Context) {
         try {            
-            const tokens = await this.AuthClass.CreateTokenPairs({userId: "sdasd"})
-
-            console.log(tokens.accessToken)
-
             let content = await c.req.json(); 
 
             const body: RegisterUserInput = userRegisterInput.parse(content);
 
-            await this.AuthService.register(body);
-            
+            const newUser = await this.AuthService.register(body);
+
+
+            const tokens = await this.AuthClass.CreateTokenPairs({userId: newUser.id});
+
             const response: ApiResponse<MessageResponse> = {
                 data: {
                     message: "User registered successfully"
@@ -64,4 +63,7 @@ const userRegisterInput = z.object({
       .email({ message: "Please enter a valid email address" }),
   });
 
-auth.post('/register', (c) => new AuthRouter().register(c))
+const authRouter = new AuthRouter();
+
+auth.post('/register', (c) => authRouter.register(c))
+  
