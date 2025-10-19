@@ -18,3 +18,10 @@ export type TokenPairResponse = {
 export type TokenPayload = {
     userId: string;
 }
+
+
+export type Payload = {
+    sub: string;
+    email: string;
+    exp: number;
+}

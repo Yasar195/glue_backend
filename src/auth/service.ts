@@ -5,6 +5,10 @@ import * as bcrypt from 'bcryptjs';
 import { sign } from 'hono/jwt';
 import { Auth } from "../common/auth.class";
 import { TokenPairResponse } from "../common/types";
+import { Context, Next } from "hono";
+import { HTTPException } from "hono/http-exception";
+import { verify } from "hono/jwt";
+import { JWTPayload } from "hono/utils/jwt/types";
 
 export class AuthService {
 
@@ -64,5 +68,30 @@ export class AuthService {
             throw new Error(`Error Loging in user: ${error.message}`);
         }
     }
+
+    authMiddleware = async (c: Context, next: Next) => {
+        const authHeader = c.req.header('Authorization');
+        
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+          throw new HTTPException(401, { message: 'Missing or invalid authorization header' });
+        }
+      
+        const token = authHeader.substring(7);
+        
+        try {
+          const secret = process.env.JWT_SECRET || 'your-secret-key';
+          const payload = await verify(token, secret) as JWTPayload;
+          
+          if (payload.exp && payload.exp < Date.now() / 1000) {
+            throw new HTTPException(401, { message: 'Token expired' });
+          }
+          
+          c.set('user', payload);
+          
+          await next();
+        } catch (err) {
+          throw new HTTPException(401, { message: 'Invalid or expired token' });
+        }
+      };
 }
 
