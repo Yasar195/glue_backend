@@ -9,4 +9,8 @@ app.get('/', (c) => {
   return c.text('Hello Yasar!')
 })
 
+app.get('/v2', (c) => {
+  return c.text('Hello Yasar v2!')
+})
+
 export const handler = handle(app)
