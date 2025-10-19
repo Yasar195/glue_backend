@@ -11,11 +11,9 @@ export const auth = new Hono();
 class AuthRouter  {
 
     private AuthService: AuthService;
-    private AuthClass: Auth;
 
     constructor() {
         this.AuthService = new AuthService();
-        this.AuthClass = new Auth();
     }
 
     async register(c: Context) {
