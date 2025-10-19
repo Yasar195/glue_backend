@@ -13,10 +13,10 @@ model Users {
   id         String   @id @default(uuid(7))
   userEmail  String   @unique @map("user_email")
   userName   String?  @map("user_name")
+  password  String
   isVerified Boolean  @default(false) @map("is_verified")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
-
   @@map("users")
 }
 

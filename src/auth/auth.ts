@@ -24,10 +24,7 @@ class AuthRouter  {
 
             const body: RegisterUserInput = userRegisterInput.parse(content);
 
-            const newUser = await this.AuthService.register(body);
-
-
-            const tokens = await this.AuthClass.CreateTokenPairs({userId: newUser.id});
+            await this.AuthService.register(body);
 
             const response: ApiResponse<MessageResponse> = {
                 data: {
@@ -61,6 +58,9 @@ const userRegisterInput = z.object({
     userEmail: z
       .string({ message: "Email is required" })
       .email({ message: "Please enter a valid email address" }),
+    password: z
+      .string({ message: "Password is required" })
+      .min(8, { message: "Password must be at least 8 characters long" }),
   });
 
 const authRouter = new AuthRouter();
