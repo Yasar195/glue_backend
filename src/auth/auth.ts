@@ -67,7 +67,7 @@ class AuthRouter  {
             const response: ApiResponse<null> = {
                 data: null,
                 error: error.message,
-                message: "An error occurred during user registration",
+                message: "An error occurred during user login",
                 statusCode: 500,
                 success: false
             }
