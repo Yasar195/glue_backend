@@ -48,7 +48,45 @@ class AuthRouter  {
             return c.json(response, 500);
         }
     }
+
+    async login(c: Context) {
+        try {
+            const content = await c.req.json();
+            const body = userLoginInput.parse(content);
+
+            const tokens = await this.AuthService.login(body);
+
+            const response: ApiResponse<{ accessToken: string; refreshToken: string; }> = {
+                data: tokens,
+                error: null,
+                message: "Login successful",
+                statusCode: 200,
+                success: true
+            };
+
+            return c.json(response, 200);
+        } catch (error: any) {
+            const response: ApiResponse<null> = {
+                data: null,
+                error: error.message,
+                message: "An error occurred during user registration",
+                statusCode: 500,
+                success: false
+            }
+            return c.json(response, 500);        
+        }
+    }
 }
+
+
+const userLoginInput = z.object({
+    userEmail: z
+      .string({ message: "Email is required" })
+      .email({ message: "Please enter a valid email address" }),
+    password: z
+      .string({ message: "Password is required" })
+      .min(1, { message: "Password cannot be empty" }),
+});
 
 const userRegisterInput = z.object({
     userName: z
@@ -66,4 +104,5 @@ const userRegisterInput = z.object({
 const authRouter = new AuthRouter();
 
 auth.post('/register', (c) => authRouter.register(c))
+auth.post('/login', (c) => authRouter.login(c))
   
